@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jadwal Praktek — RSU Surya Husadha Nusa Dua</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0E332F">
+<meta name="application-name" content="Jadwal Dokter">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jadwal Dokter">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link crossorigin="anonymous" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:light;
+    --ink:#122622;
+    --ink-soft:#4b625d;
+    --paper:#F6F3EC;
+    --paper-raised:#FFFFFF;
+    --line:#DCD5C4;
+    --teal:#1B4B45;
+    --teal-deep:#0E332F;
+    --gold:#C08A34;
+    --gold-soft:#EEDFBD;
+    --open-green:#2E7D5B;
+    --open-bg:#E4F1E9;
+    --radius:14px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --ink:#EDE8DA;
+      --ink-soft:#B9C4BE;
+      --paper:#0F1613;
+      --paper-raised:#182420;
+      --line:#2B372F;
+      --teal:#5FA893;
+      --teal-deep:#0E332F;
+      --gold:#D9A94F;
+      --gold-soft:#332A16;
+      --open-green:#7FD3AA;
+      --open-bg:#173327;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --ink:#EDE8DA;
+    --ink-soft:#B9C4BE;
+    --paper:#0F1613;
+    --paper-raised:#182420;
+    --line:#2B372F;
+    --teal:#5FA893;
+    --teal-deep:#0E332F;
+    --gold:#D9A94F;
+    --gold-soft:#332A16;
+    --open-green:#7FD3AA;
+    --open-bg:#173327;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:calc(var(--safe-t) + 96px);}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    padding-top:var(--safe-t);
+    padding-bottom:var(--safe-b);
+    -webkit-tap-highlight-color:transparent;
+  }
+  button:focus-visible, select:focus-visible, .specialty-head:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+  .hero{
+    background:linear-gradient(155deg,var(--teal-deep),var(--teal) 70%);
+    color:#F6F3EC;
+    padding:22px 18px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-40px; top:-60px;
+    width:180px; height:180px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(192,138,52,0.35),transparent 70%);
+  }
+  .hero-eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.02em;
+    color:#CFE3DA;
+    margin:0 0 6px;
+    position:relative;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:26px;
+    line-height:1.15;
+    margin:0 0 6px;
+    max-width:280px;
+    position:relative;
+  }
+  .hero p{
+    margin:0;
+    font-size:13.5px;
+    color:#D9E6DF;
+    position:relative;
+  }
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+    position:relative;
+  }
+  .clock-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12.5px;
+  }
+  .clock-dot{width:6px;height:6px;border-radius:50%;background:#8FE3B8;box-shadow:0 0 0 3px rgba(143,227,184,0.25);}
+  .install-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#E2B865;
+    color:#2A1E07;
+    border:none;
+    padding:6px 13px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .install-chip[hidden]{display:none;}
+  .ios-hint{
+    position:relative;
+    margin-top:12px !important;
+    padding:9px 12px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+    font-size:12.5px !important;
+    line-height:1.45;
+    color:#F1F6F3 !important;
+  }
+  .ios-hint[hidden]{display:none;}
+  .ios-hint button{
+    margin-left:8px;
+    background:none;
+    border:none;
+    color:#E2B865;
+    font:inherit;
+    font-weight:600;
+    text-decoration:underline;
+    padding:0;
+    cursor:pointer;
+  }
+
+  .controls{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:var(--paper);
+    padding-top:calc(var(--safe-t) + 10px);
+    margin-top:calc(var(--safe-t) * -1);
+    border-bottom:1px solid var(--line);
+  }
+  .controls-inner{padding:0 16px 10px;}
+  .search-wrap{position:relative; margin-bottom:8px;}
+  .search-wrap input{
+    width:100%;
+    padding:10px 14px 10px 38px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    color:var(--ink);
+    font-size:16px; /* 16px stops iOS from zooming in on focus */
+    font-family:inherit;
+  }
+  .search-wrap input:focus{outline:2px solid var(--teal); outline-offset:1px;}
+  .search-wrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.5;}
+
+  .filters{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .select-wrap{position:relative; min-width:0;}
+  .select-wrap select{
+    width:100%;
+    appearance:none;
+    -webkit-appearance:none;
+    padding:10px 30px 10px 12px;
+    border-radius:11px;
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    color:var(--ink);
+    font-family:inherit;
+    font-size:16px;
+    text-overflow:ellipsis;
+  }
+  .select-wrap select.active{
+    border-color:var(--teal);
+    box-shadow:inset 0 0 0 1px var(--teal);
+    font-weight:600;
+  }
+  .select-wrap svg{
+    position:absolute; right:10px; top:50%;
+    transform:translateY(-50%);
+    pointer-events:none;
+    color:var(--ink-soft);
+  }
+
+  .day-tabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+  .day-tabs::-webkit-scrollbar{display:none;}
+  .day-tab{
+    flex:0 0 auto;
+    padding:7px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    color:var(--ink-soft);
+    font-size:13.5px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .day-tab.active{
+    background:var(--teal);
+    border-color:var(--teal);
+    color:#F6F3EC;
+  }
+  :root[data-theme="dark"] .day-tab.active{color:#0F1613;}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .day-tab.active{color:#0F1613;} }
+  .day-tab .sub{display:block; font-weight:400; font-size:10.5px; opacity:0.75; margin-top:1px;}
+
+  main{padding:14px 16px 30px;}
+  .list-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px 12px;
+    margin:2px 4px 12px;
+  }
+  .result-count{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin:0;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .meta-actions{display:flex; align-items:center; gap:14px;}
+  .toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+  }
+  .toggle input{accent-color:var(--teal); width:16px; height:16px; margin:0;}
+  .link-btn{
+    background:none;
+    border:none;
+    padding:0;
+    font:inherit;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--teal);
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .link-btn[hidden]{display:none;}
+
+  .specialty-group{margin-bottom:14px;}
+  .specialty-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 14px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  .specialty-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:16px;
+    margin:0;
+    letter-spacing:0.01em;
+  }
+  .specialty-head .count{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+    display:block;
+    margin-top:2px;
+  }
+  .chev{
+    width:18px;height:18px;
+    flex:0 0 auto;
+    color:var(--ink-soft);
+    transition:transform 0.2s ease;
+  }
+  .specialty-group.open .chev{transform:rotate(180deg);}
+  .specialty-group.open .specialty-head{border-radius:var(--radius) var(--radius) 0 0;}
+
+  .doctor-list{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows 0.22s ease;
+  }
+  .specialty-group.open .doctor-list{grid-template-rows:1fr;}
+  .doctor-list-inner{overflow:hidden;}
+
+  .doctor-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-top:none;
+    padding:12px 14px 13px;
+  }
+  .doctor-list-inner .doctor-card:last-child{border-radius:0 0 var(--radius) var(--radius);}
+  .doctor-name{
+    font-size:14.5px;
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  .doctor-note{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin:0 0 8px;
+    font-style:italic;
+  }
+  .time-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .time-chip{
+    font-size:12.5px;
+    font-family:'IBM Plex Mono',monospace;
+    padding:5px 9px;
+    border-radius:8px;
+    background:var(--gold-soft);
+    color:var(--teal-deep);
+    border:1px solid transparent;
+  }
+  :root[data-theme="dark"] .time-chip{color:var(--gold);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .time-chip{color:var(--gold);} }
+  .time-chip.open-now{
+    background:var(--open-bg);
+    color:var(--open-green) !important;
+    border-color:var(--open-green);
+    font-weight:600;
+  }
+  .no-practice{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    opacity:0.7;
+  }
+
+  /* weekly view (tab "Semua") */
+  .week{display:grid; gap:8px;}
+  .week-row{
+    display:grid;
+    grid-template-columns:92px 1fr;
+    gap:8px;
+    align-items:start;
+  }
+  .week-days{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding-top:6px;
+    line-height:1.3;
+  }
+  .week-row.today .week-days{color:var(--open-green); font-weight:600;}
+  .week-off{font-size:12px; color:var(--ink-soft); opacity:0.75; margin:2px 0 0;}
+
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state svg{opacity:0.4; margin-bottom:10px;}
+  .empty-state p{font-size:14px; margin:0 0 10px;}
+
+  footer{
+    padding:18px 16px calc(20px + var(--safe-b));
+    text-align:center;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;
+  }
+
+  @media (min-width:640px){
+    main{max-width:600px; margin:0 auto;}
+    .hero, .controls-inner{max-width:600px; margin:0 auto;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .doctor-list, .chev{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <p class="hero-eyebrow">RSU SURYA HUSADHA · NUSA DUA, BALI</p>
+  <h1>Jadwal Praktek Dokter Spesialis</h1>
+  <p>Berlaku per 1 September 2026 · Jl. Siligita Blok I No.14</p>
+  <div class="chip-row">
+    <div class="clock-chip"><span class="clock-dot"></span><span id="clockText">memuat waktu…</span></div>
+    <button class="install-chip" id="installBtn" type="button" hidden>Pasang di HP</button>
+  </div>
+  <p class="ios-hint" id="iosHint" hidden>Untuk memasang di iPhone: ketuk tombol Bagikan di Safari, lalu pilih “Tambah ke Layar Utama”.<button type="button" id="iosHintClose">Tutup</button></p>
+</div>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Cari dokter atau divisi" autocomplete="off" aria-label="Cari dokter atau divisi">
+    </div>
+    <div class="filters">
+      <div class="select-wrap">
+        <select id="divisiSelect" aria-label="Filter divisi"></select>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="select-wrap">
+        <select id="dokterSelect" aria-label="Filter dokter"></select>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div class="day-tabs" id="dayTabs" role="group" aria-label="Filter hari"></div>
+  </div>
+</div>
+
+<main>
+  <div class="list-meta">
+    <p class="result-count" id="resultCount"></p>
+    <div class="meta-actions">
+      <label class="toggle"><input type="checkbox" id="showOffToggle"> Tampilkan yang libur</label>
+      <button class="link-btn" id="resetBtn" type="button" hidden>Reset filter</button>
+    </div>
+  </div>
+  <div id="listRoot"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <p id="emptyText">Tidak ada dokter yang cocok. Coba kata kunci lain.</p>
+    <button class="link-btn" id="emptyReset" type="button">Reset filter</button>
+  </div>
+</main>
+
+<footer>Data internal FO · sentuh nama divisi untuk buka/tutup daftar dokter</footer>
+
+<script>
+const DATA = [{"specialty": "OBSTETRI DAN GINEKOLOGI", "doctors": [{"name": "Dr. I Wyn Putra Darmawan, Sp. OG", "note": "", "schedule": {"Senin": ["10.00 - 13.00", "19.30 - 21.00"], "Selasa": ["10.00 - 13.00", "19.30 - 21.00"], "Rabu": ["10.00 - 13.00", "19.30 - 21.00"], "Kamis": ["10.00 - 13.00", "19.30 - 21.00"], "Jum'at": ["10.00 - 13.00"], "Sabtu": ["10.00 - 12.00"], "Minggu": []}}, {"name": "Dr. I Gd Deni Surasandi, Sp. OG (K)", "note": "", "schedule": {"Senin": ["18.30 - 21.00"], "Selasa": ["18.30 - 21.00"], "Rabu": ["18.30 - 21.00"], "Kamis": ["18.30 - 21.00"], "Jum'at": ["18.30 - 21.00"], "Sabtu": ["18.30 - 21.00"], "Minggu": []}}, {"name": "Dr. Ni Komang Juniastari, Sp.OG", "note": "", "schedule": {"Senin": ["13.00 - 15.00"], "Selasa": ["13.00 - 15.00"], "Rabu": ["13.00 - 15.00"], "Kamis": ["13.00 - 15.00"], "Jum'at": ["13.00 - 15.00"], "Sabtu": ["13.00 - 15.00"], "Minggu": []}}, {"name": "Dr. I Wyn Rivandi Mardana,Sp.OG", "note": "", "schedule": {"Senin": ["16:00 - 18:00"], "Selasa": ["16:00 - 18:00"], "Rabu": ["16:00 - 18:00"], "Kamis": ["16:00 - 18:00"], "Jum'at": ["16:00 - 18:00"], "Sabtu": [], "Minggu": []}}]}, {"specialty": "ANAK", "doctors": [{"name": "Dr. Ni Putu Mayasri Wulandari, SpA", "note": "", "schedule": {"Senin": ["09.00-13.30"], "Selasa": ["09.00-13.30"], "Rabu": ["09.00-13.30"], "Kamis": ["09.00-13.30"], "Jum'at": ["09.00-13.30"], "Sabtu": ["09.00-13.30"], "Minggu": []}}, {"name": "Dr. M.M Wulandari Tri Lestari, Sp.A", "note": "", "schedule": {"Senin": ["18.00 - 19:30"], "Selasa": [], "Rabu": ["18.00 - 19:30"], "Kamis": [], "Jum'at": ["18.00 - 19:30"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Putu Jerry Eka Rahayu P, SpA", "note": "", "schedule": {"Senin": ["16.00 - 17.30"], "Selasa": ["17:30 - 20.00"], "Rabu": ["16.00 - 17.30"], "Kamis": ["17:30 - 20.00"], "Jum'at": ["16.00 - 17.30"], "Sabtu": ["17:30 - 20.00"], "Minggu": []}}, {"name": "Dr. Anik Cindi, Sp.A", "note": "", "schedule": {"Senin": ["14.00 - 15.00"], "Selasa": [], "Rabu": ["14.00 - 15.00"], "Kamis": [], "Jum'at": ["14.00 - 15.00"], "Sabtu": [], "Minggu": ["11.00-13.00"]}}, {"name": "Dr. Made Indah Nastiti Utami Budha,Sp.A", "note": "", "schedule": {"Senin": [], "Selasa": ["15:00-17:00"], "Rabu": [], "Kamis": ["15:00-17:00"], "Jum'at": [], "Sabtu": ["15:00-17:00"], "Minggu": []}}]}, {"specialty": "INTERNA", "doctors": [{"name": "Dr. IGN Eka Imbawan, Sp.PD", "note": "", "schedule": {"Senin": ["09.00-12.00", "13.00-15.00"], "Selasa": ["09.00-12.00", "13.00-15.00"], "Rabu": ["09.00-12.00", "13.00-15.00"], "Kamis": ["09.00-12.00", "13.00-15.00"], "Jum'at": ["09.00-12.00", "13.00-15.00"], "Sabtu": ["09.00-12.00"], "Minggu": []}}, {"name": "Dr. dr. Luh Gede Sri Yenny, Sp.PD", "note": "", "schedule": {"Senin": ["14.00-16.00"], "Selasa": ["14.00-16.00"], "Rabu": ["14.00-16.00"], "Kamis": ["14.00-16.00"], "Jum'at": ["14.00-16.00"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Kt. Gede Wiradharma, SpPD", "note": "", "schedule": {"Senin": [], "Selasa": ["17.00 - 19.00"], "Rabu": [], "Kamis": ["17.00 - 19.00"], "Jum'at": [], "Sabtu": ["15.00 - 17.00"], "Minggu": []}}, {"name": "Dr. Sang Bagus Kt Dwiadnyana, SpPD", "note": "", "schedule": {"Senin": ["16.00 - 17.00"], "Selasa": ["16.00 - 17.00"], "Rabu": ["16.00 - 17.00"], "Kamis": ["16.00 - 17.00"], "Jum'at": ["16.00 - 17.00"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. dr. I Made Suma Wirawan, SpPD", "note": "", "schedule": {"Senin": ["17.00 - 18.00"], "Selasa": [], "Rabu": ["17.00 - 18.00"], "Kamis": [], "Jum'at": ["17.00 - 18.00"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Ni Wayan Anantika Riani,M,Biomed,Sp.PD", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "dr. Kurniawan Sp.PD", "note": "", "schedule": {"Senin": ["19.00-21.00"], "Selasa": ["19.00-21.00"], "Rabu": ["19.00-21.00"], "Kamis": ["19.00-21.00"], "Jum'at": ["19.00-21.00"], "Sabtu": [], "Minggu": []}}, {"name": "dr. Gede Arya Dwipayana,Sp.PD", "note": "", "schedule": {"Senin": [], "Selasa": ["19.00-21.00"], "Rabu": [], "Kamis": ["19.00-21.00"], "Jum'at": [], "Sabtu": ["19.00-21.00"], "Minggu": []}}, {"name": "dr. Anak Agung Raditya Wedananta,Sp.PD", "note": "", "schedule": {"Senin": ["18.00-20.00"], "Selasa": [], "Rabu": ["18.00-20.00"], "Kamis": [], "Jum'at": ["18.00-20.00"], "Sabtu": [], "Minggu": ["09.00-12.00"]}}]}, {"specialty": "PARU", "doctors": [{"name": "Dr. A A Gede Upeksha, Sp. P", "note": "", "schedule": {"Senin": ["18.00-20.00"], "Selasa": [], "Rabu": ["18.00-20.00"], "Kamis": [], "Jum'at": ["18.00-20.00"], "Sabtu": ["14.00-15.00"], "Minggu": []}}, {"name": "dr.  Desak Putu Agung Krisdanti Sp.P", "note": "", "schedule": {"Senin": [], "Selasa": ["19.00-21.00"], "Rabu": [], "Kamis": ["16.30-18.00"], "Jum'at": [], "Sabtu": [], "Minggu": []}}]}, {"specialty": "BEDAH UMUM", "doctors": [{"name": "Dr. Edy Widyanto, Sp.B", "note": "Dokter istirahat selama 1 jam pkl 12.00-13.00.", "schedule": {"Senin": ["09.00 - 13.00"], "Selasa": ["09.00 - 13.00", "16.00 - 18.00", "19.00 - 20.30"], "Rabu": ["09.00 - 13.00", "19.00-20.30"], "Kamis": ["09.00 - 13.00", "16.00-18.00", "19.00-20.30"], "Jum'at": ["09.00 - 13.00", "19.00-20.30"], "Sabtu": ["09.00 - 13.00", "19.00-20.30"], "Minggu": []}}, {"name": "Dr. I.B. Putu Wiyasa, SpB", "note": "", "schedule": {"Senin": ["15.30 - 17.30"], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": ["15.30-17.30"], "Sabtu": [], "Minggu": []}}, {"name": "dr. I Made Maha Satya, Sp. B", "note": "", "schedule": {"Senin": ["19.00-21.00"], "Selasa": [], "Rabu": ["16.00-18.00"], "Kamis": [], "Jum'at": [], "Sabtu": ["16.00-18.00"], "Minggu": []}}]}, {"specialty": "BEDAH TULANG", "doctors": [{"name": "Dr. I Wayan Subawa, Sp.OT", "note": "", "schedule": {"Senin": ["16.00 - 18.00"], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": ["16.00 - 18.00"], "Sabtu": [], "Minggu": []}}, {"name": "dr. Feryawan Meregawa, Sp.OT", "note": "", "schedule": {"Senin": [], "Selasa": ["18:00-21:00"], "Rabu": ["18:00-21:00"], "Kamis": ["18:00-21:00"], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "dr. I Nyoman Yuda Raditya, Sp. OT", "note": "", "schedule": {"Senin": ["09.00 - 11.00"], "Selasa": ["15:00 - 17:00"], "Rabu": ["09.00 - 11.00"], "Kamis": ["15:00 - 17:00"], "Jum'at": ["09.00 - 11.00"], "Sabtu": [], "Minggu": []}}, {"name": "dr. Agus Suarjaya Putra, Sp.OT", "note": "", "schedule": {"Senin": [], "Selasa": ["09.00 - 11.00"], "Rabu": ["14:00-16:00"], "Kamis": ["09.00 - 11.00"], "Jum'at": ["18.00 - 20.00"], "Sabtu": ["10.00 - 12.00"], "Minggu": []}}]}, {"specialty": "UROLOGI", "doctors": [{"name": "Dr. Pande Made Wisnu Tirtayasa, SpU", "note": "", "schedule": {"Senin": ["16:05-18:00"], "Selasa": [], "Rabu": ["16:05-18:00"], "Kamis": [], "Jum'at": ["16:05-18:00"], "Sabtu": [], "Minggu": []}}]}, {"specialty": "BEDAH MULUT", "doctors": [{"name": "drg.Khriztie Limanthara,Sp.BM", "note": "Maksimal 20 pasien", "schedule": {"Senin": ["12:00-14:00"], "Selasa": [], "Rabu": ["12:00-14:00"], "Kamis": [], "Jum'at": [], "Sabtu": ["08:00-12:00"], "Minggu": []}}]}, {"specialty": "THT", "doctors": [{"name": "Dr. Putu Agus Setiabudi, Sp.THT", "note": "", "schedule": {"Senin": ["09.00 - 12.30", "18.00 - 21.00"], "Selasa": ["09.00 - 12.30", "18.00 - 21.00"], "Rabu": ["09.00 - 12.30", "18.00 - 21.00"], "Kamis": ["09.00 - 12.30", "18.00 - 21.00"], "Jum'at": ["09.00 - 12.30", "18.00 - 21.00"], "Sabtu": ["09.00 - 12.30", "18.00 - 21.00"], "Minggu": ["19.00 - 21.00"]}}, {"name": "Dr. Agus Rudi Asthuta, Sp.THT", "note": "", "schedule": {"Senin": ["12:30-15:30", "18.00-21.00"], "Selasa": ["12:30-15:30"], "Rabu": ["12:30-15:30", "18.00-21.00"], "Kamis": ["12:30-15:30"], "Jum'at": ["12:30-15:30", "18.00-21.00"], "Sabtu": ["12:30-15:30"], "Minggu": []}}, {"name": "dr. Ida Ayu Alit Widiantari, Sp.THT-KL", "note": "Pendaftaran pasien terakhir pkl 17.30", "schedule": {"Senin": ["16.05 - 17.30"], "Selasa": ["16.05 - 17.30"], "Rabu": ["16.05 - 17.30"], "Kamis": ["16.05 - 17.30"], "Jum'at": ["16.05 - 17.30"], "Sabtu": ["16.05 - 17.30"], "Minggu": []}}]}, {"specialty": "KULIT DAN KELAMIN", "doctors": [{"name": "Dr. Ratih V. Karna, Sp.KK", "note": "", "schedule": {"Senin": [], "Selasa": ["19.30 - 21.00"], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Dr. I Putu Agus Gautama, Sp. KK", "note": "", "schedule": {"Senin": ["11.00 - 13.00", "19.00 - 21.00"], "Selasa": ["11.00 - 13.00"], "Rabu": ["11.00 - 13.00", "19.00 - 21.00"], "Kamis": ["11.00 - 13.00"], "Jum'at": ["11.00 - 13.00", "19.00 - 21.00"], "Sabtu": ["11.00 - 13.00"], "Minggu": []}}]}, {"specialty": "SARAF", "doctors": [{"name": "Dr. I.G.N. Putra Martin Widanta, Sp.S", "note": "", "schedule": {"Senin": ["10.00-13.00"], "Selasa": ["10.00-13.00"], "Rabu": ["10.00-13.00"], "Kamis": ["10.00-13.00"], "Jum'at": ["10.00-13.00"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Agus Suryawan, SpS", "note": "", "schedule": {"Senin": [], "Selasa": ["18.00 - 19.30"], "Rabu": [], "Kamis": ["18.00 - 19.30"], "Jum'at": ["18.00 - 19.30"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Putu Gde Rothaarnada, SpS", "note": "", "schedule": {"Senin": ["19.00-21.00"], "Selasa": [], "Rabu": ["19.00-21.00"], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Ni Made Kurnia Dwi Jayanthi, Sp.N", "note": "", "schedule": {"Senin": [], "Selasa": ["16:00-17:30"], "Rabu": ["16:00-17:30"], "Kamis": [], "Jum'at": [], "Sabtu": ["18.00-21.00"], "Minggu": []}}]}, {"specialty": "MATA", "doctors": [{"name": "Dr. I Gusti Ayu Made Juliari, Sp.M (K)", "note": "(infeksi)", "schedule": {"Senin": [], "Selasa": ["18.00 - 20.00"], "Rabu": ["18.00 - 20.00"], "Kamis": [], "Jum'at": ["18.00 - 20.00"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Ni Made Kartika Rahayu, Sp.M", "note": "(ahli retina)", "schedule": {"Senin": ["09.00 - 12.30"], "Selasa": ["09.00 - 13.00"], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Dr. A.A. Istri Ratih Kemala Dewi, Sp.M", "note": "(mata umum)", "schedule": {"Senin": [], "Selasa": [], "Rabu": ["11.00 - 13.00"], "Kamis": ["11.00-13.00"], "Jum'at": [], "Sabtu": ["10.30 - 12.30"], "Minggu": []}}, {"name": "Dr. Krisnhaliani Wetarini, Sp.M", "note": "", "schedule": {"Senin": ["18.00 - 20.00"], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}]}, {"specialty": "KEDOKTERAN JIWA (PSIKIATRI)", "doctors": [{"name": "Dr. I.A. Putu Asthi Damayanthi, SpKJ", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": [], "Kamis": ["16.00 - 18.00"], "Jum'at": [], "Sabtu": [], "Minggu": ["09.00 - 11.00"]}}, {"name": "dr. I Gusti Agung Ayu Widyarini, Sp. KJ", "note": "", "schedule": {"Senin": ["16.00 - 17.30"], "Selasa": [], "Rabu": ["16.00 - 17.30"], "Kamis": [], "Jum'at": [], "Sabtu": ["11.00-13.00"], "Minggu": []}}]}, {"specialty": "ANESTESI", "doctors": [{"name": "Dr. Wayan Budi Artana, Sp.An", "note": "", "schedule": {"Senin": ["08.00 - 08.00 (24 jam)- jadwal jaga emergensi diatur dari bagian Anestesi per bulan"], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Werda, Sp.An", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Iswahyudi,Sp.An", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Dr. Pasek,Sp.An", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}]}, {"specialty": "RADIOLOGI", "doctors": [{"name": "dr. Gede Arya Wibawa Ugu Marta, SpRad", "note": "", "schedule": {"Senin": ["16.00-19.00"], "Selasa": ["09.00 - 12.00"], "Rabu": ["16.00-19.00"], "Kamis": ["09.00 - 12.00"], "Jum'at": ["16.00-19.00"], "Sabtu": [], "Minggu": []}}, {"name": "dr. Winda Wirastuti Giri, SpRad", "note": "", "schedule": {"Senin": [], "Selasa": ["14.00 - 17.00"], "Rabu": [], "Kamis": ["13.00-16.00"], "Jum'at": ["13.00-16.00"], "Sabtu": ["08.00 - 10.00"], "Minggu": []}}]}, {"specialty": "GIGI SPESIALIS", "doctors": [{"name": "Drg. Ayuthya Ajeng Windakhrisma, Sp. Perio", "note": "", "schedule": {"Senin": ["09.00 - 13.00"], "Selasa": [], "Rabu": ["09.00 - 13.00"], "Kamis": [], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Drg. Megafuri Chaya, Sp.KG", "note": "", "schedule": {"Senin": [], "Selasa": ["09.00 - 13.00"], "Rabu": [], "Kamis": ["09.00 - 13.00"], "Jum'at": ["09.00 - 13.00"], "Sabtu": [], "Minggu": []}}]}, {"specialty": "GIGI", "doctors": [{"name": "Drg. M.Taha", "note": "", "schedule": {"Senin": ["18.00-21.00"], "Selasa": ["10.00-13.00"], "Rabu": [], "Kamis": ["18.00-21.00"], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Drg. I Kt Krishna Dharma", "note": "", "schedule": {"Senin": ["10.00 - 13.00"], "Selasa": [], "Rabu": ["18.00 - 21.00"], "Kamis": [], "Jum'at": ["10.00 - 13.00"], "Sabtu": ["18.00 - 21.00"], "Minggu": []}}, {"name": "Drg. Merry Indriani", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": ["10.00 - 13.00"], "Kamis": [], "Jum'at": [], "Sabtu": ["10.00 - 13.00"], "Minggu": []}}, {"name": "Drg. Ayu Sri Adnyani", "note": "", "schedule": {"Senin": [], "Selasa": ["18.00 - 21.00"], "Rabu": [], "Kamis": [], "Jum'at": ["18.00 - 21.00"], "Sabtu": [], "Minggu": []}}, {"name": "Drg. IGA Mirah Tresna Andayani", "note": "", "schedule": {"Senin": [], "Selasa": [], "Rabu": [], "Kamis": ["10.00 - 13.00"], "Jum'at": [], "Sabtu": [], "Minggu": []}}, {"name": "Drg. Amar Rizky", "note": "", "schedule": {"Senin": [], "Selasa": ["10.00-13.00"], "Rabu": [], "Kamis": ["18.00-21.00"], "Jum'at": [], "Sabtu": [], "Minggu": []}}]}, {"specialty": "JANTUNG", "doctors": [{"name": "Dr. Nym Sukamiartadana, Sp.JP", "note": "", "schedule": {"Senin": ["09.00-13.00", "19.00-21.00"], "Selasa": ["19.00 - 21.00"], "Rabu": ["09.00-13.00"], "Kamis": [], "Jum'at": ["09.00-13.00", "19.00-21.00"], "Sabtu": [], "Minggu": []}}, {"name": "Dr. I Ketut Raditya Surya, Sp.JP", "note": "", "schedule": {"Senin": [], "Selasa": ["11.00 - 14.00"], "Rabu": [], "Kamis": ["11.00 - 14.00"], "Jum'at": [], "Sabtu": ["11.00 - 14.00"], "Minggu": []}}]}, {"specialty": "REHAB MEDIS", "doctors": [{"name": "Dr. I Made Yoga Prabawa,Sp.KFR", "note": "", "schedule": {"Senin": ["13:00-16:30"], "Selasa": ["13:00-16:30"], "Rabu": ["13:00-16:30"], "Kamis": ["13:00-16:30"], "Jum'at": ["13:00-16:30"], "Sabtu": [], "Minggu": []}}]}, {"specialty": "FISIOTHERAPY", "doctors": [{"name": "Layanan Fisiotherapy", "note": "Sabtu khusus non bpjs | Senin-Jumat bpjs dan non bpjs", "schedule": {"Senin": ["13.00-16.00"], "Selasa": ["13.00-16.00"], "Rabu": ["13.00-16.00"], "Kamis": ["13.00-16.00"], "Jum'at": ["13.00-16.00"], "Sabtu": ["09:00-12.00"], "Minggu": []}}]}];
+
+const DAYS = ['Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu','Minggu'];
+const DAY_SHORT = {'Senin':'Sen','Selasa':'Sel','Rabu':'Rab','Kamis':'Kam',"Jum'at":'Jum','Sabtu':'Sab','Minggu':'Min'};
+const JS_DAY_TO_NAME = {0:'Minggu',1:'Senin',2:'Selasa',3:'Rabu',4:'Kamis',5:"Jum'at",6:'Sabtu'};
+const ALL = 'Semua';
+
+// ---------- state ----------
+let selectedDay = 'Senin';
+let userPickedDay = false;
+let query = '';
+let divisiIdx = '';   // index of DATA group, '' = all
+let dokterId = '';    // doctor id "g-d", '' = all
+let showOff = false;  // show doctors with no practice on the chosen day
+let openSpecs = new Set();
+
+// give each doctor a stable id
+DATA.forEach((g,gi)=> g.doctors.forEach((d,di)=>{ d.id = gi + '-' + di; }));
+
+// ---------- helpers ----------
+function nowInBali(){
+  // Asia/Makassar = WITA = UTC+8 (Bali)
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset()*60000;
+  return new Date(utc + 8*3600000);
+}
+function todayNameBali(){ return JS_DAY_TO_NAME[nowInBali().getDay()]; }
+
+function parseTimeToken(tok){
+  const m = tok.match(/(\d{1,2})[.:](\d{2})/);
+  if(!m) return null;
+  return parseInt(m[1],10)*60 + parseInt(m[2],10);
+}
+function parseRange(str){
+  const parts = str.split('-').map(s=>s.trim());
+  if(parts.length < 2) return null;
+  const start = parseTimeToken(parts[0]);
+  const end = parseTimeToken(parts[1]);
+  if(start===null || end===null) return null;
+  return [start,end];
+}
+function isOpenNow(timeStr, dayName){
+  const bali = nowInBali();
+  if(JS_DAY_TO_NAME[bali.getDay()] !== dayName) return false;
+  const range = parseRange(timeStr);
+  if(!range) return false;
+  const nowMin = bali.getHours()*60 + bali.getMinutes();
+  const [s,e] = range;
+  if(s === e) return true;                 // e.g. "08.00 - 08.00 (24 jam)"
+  if(e > s) return nowMin >= s && nowMin <= e;
+  return nowMin >= s || nowMin <= e;       // overnight wrap
+}
+
+function titleCase(str){
+  return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+    .replace(/\(K\)/gi,'(K)').replace(/Bpjs/gi,'BPJS').replace(/\bTht\b/g,'THT');
+}
+function cleanName(s){
+  return s.replace(/\s+/g,' ').replace(/,(?=\S)/g,', ').trim();
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function safeGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function safeSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+function practicesOn(doc, day){ return (doc.schedule[day] || []).length > 0; }
+function practicesAny(doc){ return DAYS.some(d => practicesOn(doc,d)); }
+
+function dayLabel(idxs){
+  const runs = []; let s = idxs[0], p = idxs[0];
+  for(let i=1;i<idxs.length;i++){
+    if(idxs[i] === p+1){ p = idxs[i]; }
+    else { runs.push([s,p]); s = p = idxs[i]; }
+  }
+  runs.push([s,p]);
+  const sh = i => DAY_SHORT[DAYS[i]];
+  return runs.map(([a,b]) => a===b ? sh(a) : (b-a >= 2 ? `${sh(a)}–${sh(b)}` : `${sh(a)}, ${sh(b)}`)).join(', ');
+}
+
+function weekGroups(doc){
+  const map = new Map();
+  DAYS.forEach((d,i)=>{
+    const t = doc.schedule[d] || [];
+    if(!t.length) return;
+    const k = t.join('|');
+    if(!map.has(k)) map.set(k, {times:t, days:[]});
+    map.get(k).days.push(i);
+  });
+  return [...map.values()];
+}
+
+// ---------- clock ----------
+function updateClock(){
+  const bali = nowInBali();
+  const dayName = JS_DAY_TO_NAME[bali.getDay()];
+  const hh = String(bali.getHours()).padStart(2,'0');
+  const mm = String(bali.getMinutes()).padStart(2,'0');
+  document.getElementById('clockText').textContent = `${dayName}, ${hh}:${mm} WITA`;
+}
+
+// ---------- day tabs (built once, classes updated on click) ----------
+let tabsBuiltFor = null;
+function buildTabs(){
+  const wrap = document.getElementById('dayTabs');
+  const todayName = todayNameBali();
+  tabsBuiltFor = todayName;
+  wrap.innerHTML = '';
+  [ALL, ...DAYS].forEach(d=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'day-tab';
+    btn.dataset.day = d;
+    btn.innerHTML = (d===ALL ? 'Semua' : DAY_SHORT[d]) + (d===todayName ? '<span class="sub">hari ini</span>' : '');
+    btn.addEventListener('click', ()=>{ userPickedDay = true; selectedDay = d; render(); });
+    wrap.appendChild(btn);
+  });
+}
+function syncTabs(){
+  const wrap = document.getElementById('dayTabs');
+  let activeBtn = null;
+  wrap.querySelectorAll('.day-tab').forEach(b=>{
+    const on = b.dataset.day === selectedDay;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if(on) activeBtn = b;
+  });
+  if(activeBtn){
+    const target = activeBtn.offsetLeft - (wrap.clientWidth - activeBtn.offsetWidth)/2;
+    wrap.scrollTo({left: Math.max(0,target), behavior:'smooth'});
+  }
+}
+
+// ---------- selects ----------
+function buildDivisiOptions(){
+  const sel = document.getElementById('divisiSelect');
+  sel.innerHTML = '<option value="">Semua divisi</option>' +
+    DATA.map((g,gi)=>`<option value="${gi}">${escapeHtml(titleCase(g.specialty))}</option>`).join('');
+  sel.value = divisiIdx;
+}
+function buildDokterOptions(){
+  const sel = document.getElementById('dokterSelect');
+  let html = '<option value="">Semua dokter</option>';
+  DATA.forEach((g,gi)=>{
+    if(divisiIdx !== '' && String(gi) !== divisiIdx) return;
+    const opts = g.doctors.map(d=>`<option value="${d.id}">${escapeHtml(cleanName(d.name))}</option>`).join('');
+    html += divisiIdx === ''
+      ? `<optgroup label="${escapeHtml(titleCase(g.specialty))}">${opts}</optgroup>`
+      : opts;
+  });
+  sel.innerHTML = html;
+  sel.value = dokterId;
+  if(sel.value !== dokterId){ dokterId = ''; sel.value = ''; }
+}
+
+// ---------- filtering ----------
+function matchesQuery(doc, group){
+  if(!query) return true;
+  const q = query.toLowerCase();
+  return doc.name.toLowerCase().includes(q) ||
+         cleanName(doc.name).toLowerCase().includes(q) ||
+         group.specialty.toLowerCase().includes(q);
+}
+function doctorVisible(doc, group, gi){
+  if(divisiIdx !== '' && String(gi) !== divisiIdx) return false;
+  if(dokterId && doc.id !== dokterId) return false;
+  if(!matchesQuery(doc, group)) return false;
+  if(!showOff && !dokterId){
+    if(selectedDay === ALL ? !practicesAny(doc) : !practicesOn(doc, selectedDay)) return false;
+  }
+  return true;
+}
+function filtersActive(){ return !!(query || divisiIdx !== '' || dokterId || showOff); }
+
+// ---------- card html ----------
+function timeChip(t, open){
+  return `<span class="time-chip${open?' open-now':''}">${open?'● ':''}${escapeHtml(t)}</span>`;
+}
+function dayCardBody(doc){
+  const times = doc.schedule[selectedDay] || [];
+  if(times.length === 0) return `<div class="no-practice">Tidak praktek hari ${escapeHtml(selectedDay)}</div>`;
+  return '<div class="time-row">' + times.map(t => timeChip(t, isOpenNow(t, selectedDay))).join('') + '</div>';
+}
+function weekCardBody(doc){
+  const groups = weekGroups(doc);
+  if(groups.length === 0) return '<div class="no-practice">Jadwal belum tersedia</div>';
+  const todayName = todayNameBali();
+  const todayIdx = DAYS.indexOf(todayName);
+  const rows = groups.map(g=>{
+    const isToday = g.days.includes(todayIdx);
+    const chips = g.times.map(t => timeChip(t, isToday && isOpenNow(t, todayName))).join('');
+    return `<div class="week-row${isToday?' today':''}"><span class="week-days">${dayLabel(g.days)}</span><div class="time-row">${chips}</div></div>`;
+  }).join('');
+  const off = DAYS.map((d,i)=>i).filter(i => !(doc.schedule[DAYS[i]] || []).length);
+  const offHtml = off.length ? `<p class="week-off">Libur: ${dayLabel(off)}</p>` : '';
+  return `<div class="week">${rows}</div>${offHtml}`;
+}
+
+// ---------- render ----------
+function render(){
+  syncTabs();
+  const root = document.getElementById('listRoot');
+  root.innerHTML = '';
+  let totalDoctors = 0;
+  let shownGroups = 0;
+  const forcedOpen = !!(query || divisiIdx !== '' || dokterId);
+
+  DATA.forEach((group, gi)=>{
+    const docs = group.doctors.filter(d => doctorVisible(d, group, gi));
+    if(docs.length === 0) return;
+    shownGroups++;
+    totalDoctors += docs.length;
+
+    const isOpen = openSpecs.has(group.specialty) || forcedOpen;
+    const groupEl = document.createElement('div');
+    groupEl.className = 'specialty-group' + (isOpen ? ' open' : '');
+
+    const head = document.createElement('div');
+    head.className = 'specialty-head';
+    head.setAttribute('role','button');
+    head.tabIndex = 0;
+    head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    head.innerHTML = `
+      <div>
+        <h2>${escapeHtml(titleCase(group.specialty))}</h2>
+        <span class="count">${docs.length} dokter</span>
+      </div>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    `;
+    const toggle = ()=>{
+      const nowOpen = groupEl.classList.toggle('open');
+      head.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+      if(nowOpen) openSpecs.add(group.specialty); else openSpecs.delete(group.specialty);
+    };
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(); } });
+    groupEl.appendChild(head);
+
+    const listWrap = document.createElement('div');
+    listWrap.className = 'doctor-list';
+    const listInner = document.createElement('div');
+    listInner.className = 'doctor-list-inner';
+
+    docs.forEach(doc=>{
+      const card = document.createElement('div');
+      card.className = 'doctor-card';
+      card.innerHTML = `
+        <p class="doctor-name">${escapeHtml(cleanName(doc.name))}</p>
+        ${doc.note ? `<p class="doctor-note">${escapeHtml(doc.note)}</p>` : ''}
+        ${selectedDay === ALL ? weekCardBody(doc) : dayCardBody(doc)}
+      `;
+      listInner.appendChild(card);
+    });
+
+    listWrap.appendChild(listInner);
+    groupEl.appendChild(listWrap);
+    root.appendChild(groupEl);
+  });
+
+  const dayText = selectedDay === ALL ? 'semua hari' : `hari ${selectedDay}`;
+  document.getElementById('resultCount').textContent =
+    `${totalDoctors} dokter · ${shownGroups} divisi · ${dayText}`;
+
+  const active = filtersActive();
+  document.getElementById('resetBtn').hidden = !active;
+  document.getElementById('divisiSelect').classList.toggle('active', divisiIdx !== '');
+  document.getElementById('dokterSelect').classList.toggle('active', dokterId !== '');
+
+  const empty = shownGroups === 0;
+  document.getElementById('emptyState').style.display = empty ? 'block' : 'none';
+  if(empty){
+    document.getElementById('emptyText').textContent = (selectedDay !== ALL && !showOff)
+      ? `Tidak ada dokter yang cocok untuk hari ${selectedDay}. Coba hari lain atau ubah filter.`
+      : 'Tidak ada dokter yang cocok. Coba ubah filter atau kata kunci.';
+    document.getElementById('emptyReset').style.display = active ? 'inline' : 'none';
+  }
+}
+
+function resetFilters(){
+  query = ''; divisiIdx = ''; dokterId = ''; showOff = false;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('showOffToggle').checked = false;
+  buildDivisiOptions();
+  buildDokterOptions();
+  render();
+}
+
+// ---------- events ----------
+document.getElementById('searchInput').addEventListener('input', e=>{
+  query = e.target.value.trim();
+  render();
+});
+document.getElementById('divisiSelect').addEventListener('change', e=>{
+  divisiIdx = e.target.value;
+  buildDokterOptions();   // dokter list follows the chosen divisi
+  render();
+});
+document.getElementById('dokterSelect').addEventListener('change', e=>{
+  dokterId = e.target.value;
+  render();
+});
+document.getElementById('showOffToggle').addEventListener('change', e=>{
+  showOff = e.target.checked;
+  render();
+});
+document.getElementById('resetBtn').addEventListener('click', resetFilters);
+document.getElementById('emptyReset').addEventListener('click', resetFilters);
+
+// keep clock + "buka sekarang" fresh, and recover when the app returns from background
+function refreshLive(){
+  updateClock();
+  const today = todayNameBali();
+  if(today !== tabsBuiltFor){
+    buildTabs();
+    if(!userPickedDay) selectedDay = today;
+  }
+  render();
+}
+setInterval(refreshLive, 60000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refreshLive(); });
+
+// ---------- PWA: install + service worker ----------
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.hidden = false;
+});
+installBtn.addEventListener('click', async ()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  try{ await deferredPrompt.userChoice; }catch(e){}
+  deferredPrompt = null;
+  installBtn.hidden = true;
+});
+window.addEventListener('appinstalled', ()=>{ installBtn.hidden = true; });
+
+(function iosHint(){
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if(isIOS && !standalone && !safeGet('iosHintDismissed')){
+    const el = document.getElementById('iosHint');
+    el.hidden = false;
+    document.getElementById('iosHintClose').addEventListener('click', ()=>{
+      el.hidden = true; safeSet('iosHintDismissed','1');
+    });
+  }
+})();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+// ---------- init ----------
+(function init(){
+  selectedDay = todayNameBali();
+  buildTabs();
+  buildDivisiOptions();
+  buildDokterOptions();
+  updateClock();
+  render();
+})();
+</script>
+</body>
+</html>
